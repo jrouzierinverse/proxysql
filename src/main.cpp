@@ -1498,6 +1498,10 @@ gotofork:
 
 	} else {
 		GloAdmin->flush_error_log();
+#ifdef SYSTEMD
+		sd_notifyf(0, "READY=1\n"
+		"STATUS=ProxySQL is now processing requests...");
+#endif
 		GloVars.install_signal_handler();
 	}
 
