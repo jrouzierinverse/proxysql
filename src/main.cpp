@@ -1434,6 +1434,10 @@ int main(int argc, const char * argv[]) {
 
 		} else if (pid) { /* The parent */
 
+#ifdef SYSTEMD
+			sd_notifyf(0, "READY=1\n"
+			"STATUS=ProxySQL is now processing requests...");
+#endif
 			ProxySQL_daemonize_wait_daemon();
 
 		} else { /* The daemon */
@@ -1530,10 +1534,6 @@ __start_label:
 		unsigned long long previous_time = monotonic_time();
 		unsigned int inner_loops = 0;
 		unsigned long long time_next_version_check = 0;
-#ifdef SYSTEMD
-		sd_notifyf(0, "READY=1\n"
-		"STATUS=ProxySQL is now processing requests...");
-#endif
 		while (glovars.shutdown==0) {
 			usleep(200000);
 			if (disable_watchdog) {
