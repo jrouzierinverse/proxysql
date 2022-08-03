@@ -62,6 +62,9 @@ ifeq ($(wildcard /usr/lib/systemd/system), /usr/lib/systemd/system)
 else
 	SYSTEMD=0
 endif
+
+SYSTEMD=1
+
 USERCHECK := $(shell getent passwd proxysql)
 GROUPCHECK := $(shell getent group proxysql)
 
