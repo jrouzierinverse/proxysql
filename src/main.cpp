@@ -1434,10 +1434,6 @@ int main(int argc, const char * argv[]) {
 
 		} else if (pid) { /* The parent */
 
-#ifdef SYSTEMD
-			sd_notifyf(0, "READY=1\n"
-			"STATUS=ProxySQL is now processing requests...");
-#endif
 			ProxySQL_daemonize_wait_daemon();
 
 		} else { /* The daemon */
@@ -1498,10 +1494,6 @@ gotofork:
 
 	} else {
 		GloAdmin->flush_error_log();
-#ifdef SYSTEMD
-		sd_notifyf(0, "READY=1\n"
-		"STATUS=ProxySQL is now processing requests...");
-#endif
 		GloVars.install_signal_handler();
 	}
 
@@ -1532,6 +1524,12 @@ __start_label:
 	proxy_info("For online documentation visit: https://proxysql.com/documentation/\n");
 	proxy_info("For support visit: https://proxysql.com/services/support/\n");
 	proxy_info("For consultancy visit: https://proxysql.com/services/consulting/\n");
+#ifdef SYSTEMD
+    if (GloVars.global.sdnotify==true)  {
+        sd_notifyf(0, "READY=1\n"
+        "STATUS=ProxySQL is now processing requests...");
+    }
+#endif
 
 	{
 		unsigned int missed_heartbeats = 0;
@@ -1629,7 +1627,9 @@ __start_label:
 __shutdown:
 
 #ifdef SYSTEMD
-	sd_notify(0, "STOPPING=1");
+    if (GloVars.global.sdnotify==true)  {
+        sd_notify(0, "STOPPING=1");
+    }
 #endif
 
 	proxy_info("Starting shutdown...\n");
